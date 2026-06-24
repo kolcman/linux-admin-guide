@@ -9,35 +9,23 @@ import (
 	"linux-guide/data"
 )
 
-// --------------------------------------------------
-// Цветовая схема (ANSI)
-// Совместима с SSH, tmux, screen и обычными терминалами
-// --------------------------------------------------
-
 var (
-	// Сброс
+	// =========================
+	// CYBER MODERN PALETTE
+	// =========================
+
+	styleTitle  = "\033[1;38;5;45m"  // neon cyan
+	styleHeader = "\033[1;38;5;141m" // purple soft
+
+	styleItem   = "\033[0;38;5;250m" // light gray
+	styleCursor = "\033[1;38;5;51m"  // bright cyan
+
+	styleCmdKey = "\033[1;38;5;87m"  // electric blue
+	styleDesc   = "\033[0;38;5;245m" // muted gray
+
+	styleKeyFlag = "\033[1;38;5;220m" // amber
+
 	styleReset = "\033[0m"
-
-	// Заголовок приложения
-	styleTitle = "\033[1;94m" // Ярко-синий
-
-	// Подзаголовки разделов
-	styleHeader = "\033[1;93m" // Ярко-желтый
-
-	// Пункты меню
-	styleItem = "\033[97m" // Белый
-
-	// Выбранный пункт
-	styleCursor = "\033[30;46m" // Черный на голубом фоне
-
-	// Команды
-	styleCmdKey = "\033[1;92m" // Ярко-зеленый
-
-	// Описание
-	styleDesc = "\033[90m" // Серый
-
-	// Ключи и параметры
-	styleKeyFlag = "\033[1;96m" // Яркий голубой
 )
 
 type model struct {
@@ -45,15 +33,20 @@ type model struct {
 	state          int
 	currentSection *data.Section
 	menuItems      []string
+
+	scroll int
+	lines  []string
+
+	height int
+	width  int
 }
 
 func newModel() model {
 	m := model{}
 
 	sections := data.GetAllSections()
-
-	for i := 1; i <= len(sections); i++ {
-		if sec, ok := sections[i]; ok {
+	for i := 0; i < len(sections); i++ {
+		if sec, ok := sections[i+1]; ok {
 			m.menuItems = append(m.menuItems, sec.Title)
 		}
 	}
@@ -66,30 +59,25 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
+	switch msg := (msg).(type) {
+
+	case tea.WindowSizeMsg:
+		m.height = msg.Height
+		m.width = msg.Width
 
 	case tea.KeyMsg:
-
 		switch msg.String() {
 
 		case "ctrl+c", "q":
 			return m, tea.Quit
-
-		case "up", "k":
-			if m.state == 0 && m.cursor > 0 {
-				m.cursor--
-			}
-
-		case "down", "j":
-			if m.state == 0 && m.cursor < len(m.menuItems)-1 {
-				m.cursor++
-			}
 
 		case "enter":
 			if m.state == 0 {
 				if sec, ok := data.GetAllSections()[m.cursor+1]; ok {
 					m.currentSection = &sec
 					m.state = 1
+					m.scroll = 0
+					m.lines = buildLines(m)
 				}
 			} else {
 				m.state = 0
@@ -101,6 +89,26 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				return m, tea.Quit
 			}
+
+		case "up", "k":
+			if m.state == 0 {
+				if m.cursor > 0 {
+					m.cursor--
+				}
+			} else {
+				if m.scroll > 0 {
+					m.scroll--
+				}
+			}
+
+		case "down", "j":
+			if m.state == 0 {
+				if m.cursor < len(m.menuItems)-1 {
+					m.cursor++
+				}
+			} else {
+				m.scroll++
+			}
 		}
 	}
 
@@ -108,119 +116,118 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var s strings.Builder
+	var out strings.Builder
 
+	// =========================
+	// MENU
+	// =========================
 	if m.state == 0 {
-
-		s.WriteString(fmt.Sprintf(
-			"%s\n  📖 LINUX ADMIN GUIDE\n%s\n\n",
-			styleTitle,
-			styleReset,
-		))
+		out.WriteString(fmt.Sprintf("%s\n  🐧 LINUX GUIDE (CYBER)\n%s\n\n", styleTitle, styleReset))
 
 		for i, item := range m.menuItems {
-
 			cursor := " "
+			color := styleItem
 
-			itemStyle := styleItem
-
-			if m.cursor == i {
-				cursor = "▶"
-				itemStyle = styleCursor
+			if i == m.cursor {
+				cursor = "❯"
+				color = styleCursor
 			}
 
-			s.WriteString(fmt.Sprintf(
-				"  %s %s%s%s\n",
+			out.WriteString(fmt.Sprintf("  %s %s%s%s\n",
 				cursor,
-				itemStyle,
+				color,
 				item,
 				styleReset,
 			))
 		}
 
-		s.WriteString("\n  ↑↓ / j k • Enter — открыть • q — выход")
-
-	} else {
-
-		line := strings.Repeat("═", 60)
-
-		s.WriteString(fmt.Sprintf(
-			"%s%s\n  %s%s\n%s\n\n",
-			styleTitle,
-			line,
-			m.currentSection.Title,
-			styleReset,
-			line,
-		))
-
-		for _, item := range m.currentSection.Items {
-
-			switch item.Type {
-
-			case data.TypeHeader:
-
-				s.WriteString(fmt.Sprintf(
-					"\n%s  %s%s\n",
-					styleHeader,
-					item.Value,
-					styleReset,
-				))
-
-			case data.TypeCmd:
-
-				s.WriteString(fmt.Sprintf(
-					"  %s$ %s%s\n     %s│ %s%s\n\n",
-					styleCmdKey,
-					item.Value,
-					styleReset,
-					styleDesc,
-					item.Desc,
-					styleReset,
-				))
-
-			case data.TypeKey:
-
-				s.WriteString(fmt.Sprintf(
-					"     %s• %s%s %s\n",
-					styleKeyFlag,
-					item.Key,
-					styleReset,
-					item.Desc,
-				))
-
-			case data.TypeVar:
-
-				s.WriteString(fmt.Sprintf(
-					"     %s• %s%s %s\n",
-					styleCmdKey,
-					item.Key,
-					styleReset,
-					item.Desc,
-				))
-
-			case data.TypeYaml:
-
-				s.WriteString(fmt.Sprintf(
-					"     %s• %s%s %s\n",
-					styleKeyFlag,
-					item.Key,
-					styleReset,
-					item.Desc,
-				))
-			}
-		}
-
-		s.WriteString("\n  Esc / Enter — назад")
+		out.WriteString("\n  ↑↓ / j k • Enter • q")
+		return out.String()
 	}
 
-	return s.String()
+	// =========================
+	// INIT CONTENT
+	// =========================
+	if len(m.lines) == 0 && m.currentSection != nil {
+		m.lines = buildLines(m)
+	}
+
+	// =========================
+	// AUTO HEIGHT
+	// =========================
+	height := m.height
+	if height <= 0 {
+		height = 25
+	}
+
+	// =========================
+	// CLAMP SCROLL
+	// =========================
+	maxScroll := len(m.lines) - height
+	if maxScroll < 0 {
+		maxScroll = 0
+	}
+
+	if m.scroll < 0 {
+		m.scroll = 0
+	}
+
+	if m.scroll > maxScroll {
+		m.scroll = maxScroll
+	}
+
+	end := m.scroll + height
+	if end > len(m.lines) {
+		end = len(m.lines)
+	}
+
+	return strings.Join(m.lines[m.scroll:end], "\n")
+}
+
+func buildLines(m model) []string {
+	var out []string
+
+	line := strings.Repeat("─", 60)
+
+	out = append(out,
+		styleTitle+line+styleReset,
+		"  "+styleHeader+m.currentSection.Title+styleReset,
+		styleTitle+line+styleReset,
+	)
+
+	for _, item := range m.currentSection.Items {
+
+		switch item.Type {
+
+		case data.TypeHeader:
+			out = append(out, "", styleHeader+item.Value+styleReset)
+
+		case data.TypeCmd:
+			out = append(out,
+				"  "+styleCmdKey+"$ "+item.Value+styleReset,
+			)
+
+			if item.Desc != "" {
+				out = append(out,
+					"     "+styleDesc+"→ "+item.Desc+styleReset,
+				)
+			}
+
+		case data.TypeKey:
+			out = append(out,
+				"     "+styleKeyFlag+"["+item.Key+"] "+styleReset+item.Desc,
+			)
+		}
+	}
+
+	return out
 }
 
 func main() {
-	p := tea.NewProgram(newModel())
+	p := tea.NewProgram(newModel(), tea.WithAltScreen())
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Ошибка:", err)
+		fmt.Println("error:", err)
 		os.Exit(1)
 	}
 }
