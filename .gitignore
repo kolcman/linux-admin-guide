@@ -1,0 +1,34 @@
+# Бинарники
+/linux-guide
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go
+*.test
+*.out
+coverage.html
+/vendor/
+go.work
+go.work.sum
+
+# IDE / редактор
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Локальные секреты
+.env
+.env.*
+
+# Локальная сборка
+/bin/
+/dist/

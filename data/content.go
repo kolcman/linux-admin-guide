@@ -1,5 +1,6 @@
 package data
 
+// GetAllSections — плоский список (legacy). Меню: data.GetMenu().
 func GetAllSections() map[int]Section {
 	return map[int]Section{
 		1:  DisksSection,
@@ -10,8 +11,6 @@ func GetAllSections() map[int]Section {
 		6:  BackupSection,
 		7:  ServicesSection,
 		8:  PackagesSection,
-		9:  DockerSingleSection,
-		10: DockerComposeSection,
-		11: GitLabSection,
+		9:  GitLabSection,
 	}
 }

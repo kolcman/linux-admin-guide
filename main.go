@@ -7,32 +7,30 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"linux-guide/data"
+	"linux-guide/ui"
 )
 
-var (
-	// =========================
-	// CYBER MODERN PALETTE
-	// =========================
-
-	styleTitle  = "\033[1;38;5;45m"  // neon cyan
-	styleHeader = "\033[1;38;5;141m" // purple soft
-
-	styleItem   = "\033[0;38;5;250m" // light gray
-	styleCursor = "\033[1;38;5;51m"  // bright cyan
-
-	styleCmdKey = "\033[1;38;5;87m"  // electric blue
-	styleDesc   = "\033[0;38;5;245m" // muted gray
-
-	styleKeyFlag = "\033[1;38;5;220m" // amber
-
-	styleReset = "\033[0m"
+const (
+	stateMainMenu = iota
+	stateSubMenu
+	stateContent
 )
+
+type menuFrame struct {
+	title  string
+	items  []data.MenuItem
+	cursor int
+}
 
 type model struct {
-	cursor         int
-	state          int
+	cursor int
+	state  int
+
+	rootMenu   []data.MenuItem
+	rootCursor int
+	menuStack  []menuFrame
+
 	currentSection *data.Section
-	menuItems      []string
 
 	scroll int
 	lines  []string
@@ -42,20 +40,129 @@ type model struct {
 }
 
 func newModel() model {
-	m := model{}
-
-	sections := data.GetAllSections()
-	for i := 0; i < len(sections); i++ {
-		if sec, ok := sections[i+1]; ok {
-			m.menuItems = append(m.menuItems, sec.Title)
-		}
+	return model{
+		rootMenu: data.GetMenu(),
 	}
-
-	return m
 }
 
 func (m model) Init() tea.Cmd {
 	return nil
+}
+
+func (m model) activeItems() []data.MenuItem {
+	if len(m.menuStack) == 0 {
+		return m.rootMenu
+	}
+	return m.menuStack[len(m.menuStack)-1].items
+}
+
+func (m model) menuTitle() string {
+	if len(m.menuStack) == 0 {
+		return "Инструменты для DevOps"
+	}
+	return m.menuStack[len(m.menuStack)-1].title
+}
+
+func (m model) menuSubtitle() string {
+	if len(m.menuStack) <= 1 {
+		return "выберите раздел"
+	}
+	parts := make([]string, len(m.menuStack)-1)
+	for i := 0; i < len(m.menuStack)-1; i++ {
+		parts[i] = m.menuStack[i].title
+	}
+	return strings.Join(parts, "  ›  ")
+}
+
+func (m *model) saveMenuCursor() {
+	if len(m.menuStack) == 0 {
+		m.rootCursor = m.cursor
+		return
+	}
+	m.menuStack[len(m.menuStack)-1].cursor = m.cursor
+}
+
+func (m *model) enterGroup(item data.MenuItem) {
+	m.saveMenuCursor()
+	m.menuStack = append(m.menuStack, menuFrame{
+		title:  item.Title,
+		items:  item.Children,
+		cursor: 0,
+	})
+	m.cursor = 0
+	m.state = stateSubMenu
+}
+
+func (m *model) openSection(section *data.Section) {
+	m.saveMenuCursor()
+	m.currentSection = section
+	m.state = stateContent
+	m.scroll = 0
+	m.lines = ui.BuildSectionLines(section)
+}
+
+func (m *model) goBack() {
+	switch m.state {
+	case stateContent:
+		m.currentSection = nil
+		m.lines = nil
+		m.scroll = 0
+		if len(m.menuStack) > 0 {
+			m.state = stateSubMenu
+			m.cursor = m.menuStack[len(m.menuStack)-1].cursor
+		} else {
+			m.state = stateMainMenu
+			m.cursor = m.rootCursor
+		}
+
+	case stateSubMenu:
+		if len(m.menuStack) == 0 {
+			m.state = stateMainMenu
+			return
+		}
+		m.cursor = m.menuStack[len(m.menuStack)-1].cursor
+		m.menuStack = m.menuStack[:len(m.menuStack)-1]
+		if len(m.menuStack) == 0 {
+			m.state = stateMainMenu
+			m.cursor = m.rootCursor
+		}
+	}
+}
+
+func (m model) clampScroll() int {
+	viewport := ui.ContentViewport(m.height)
+	maxScroll := len(m.lines) - viewport
+	if maxScroll < 0 {
+		return 0
+	}
+	if m.scroll > maxScroll {
+		return maxScroll
+	}
+	if m.scroll < 0 {
+		return 0
+	}
+	return m.scroll
+}
+
+func (m model) breadcrumb() string {
+	if m.currentSection == nil {
+		return ""
+	}
+	parts := make([]string, len(m.menuStack))
+	for i, f := range m.menuStack {
+		parts[i] = f.title
+	}
+	parts = append(parts, m.currentSection.Title)
+	return strings.Join(parts, "  ›  ")
+}
+
+func (m model) selectMenuItem(item data.MenuItem) model {
+	if item.IsGroup() {
+		m.enterGroup(item)
+	} else {
+		m.openSection(item.Section)
+	}
+	return m
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -68,46 +175,45 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 
-		case "ctrl+c", "q":
-			return m, tea.Quit
+		case "ctrl+c", "q", "й":
+			if m.state == stateMainMenu {
+				return m, tea.Quit
+			}
+			m.goBack()
 
 		case "enter":
-			if m.state == 0 {
-				if sec, ok := data.GetAllSections()[m.cursor+1]; ok {
-					m.currentSection = &sec
-					m.state = 1
-					m.scroll = 0
-					m.lines = buildLines(m)
-				}
-			} else {
-				m.state = 0
+			switch m.state {
+			case stateMainMenu, stateSubMenu:
+				items := m.activeItems()
+				m = m.selectMenuItem(items[m.cursor])
+			case stateContent:
+				m.goBack()
 			}
 
 		case "esc":
-			if m.state == 1 {
-				m.state = 0
-			} else {
+			if m.state == stateMainMenu {
 				return m, tea.Quit
 			}
+			m.goBack()
 
 		case "up", "k":
-			if m.state == 0 {
-				if m.cursor > 0 {
-					m.cursor--
-				}
-			} else {
+			if m.state == stateContent {
 				if m.scroll > 0 {
 					m.scroll--
 				}
+			} else if m.cursor > 0 {
+				m.cursor--
 			}
 
 		case "down", "j":
-			if m.state == 0 {
-				if m.cursor < len(m.menuItems)-1 {
+			if m.state == stateContent {
+				m.scroll++
+				m.scroll = m.clampScroll()
+			} else {
+				items := m.activeItems()
+				if m.cursor < len(items)-1 {
 					m.cursor++
 				}
-			} else {
-				m.scroll++
 			}
 		}
 	}
@@ -116,111 +222,39 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var out strings.Builder
+	switch m.state {
+	case stateMainMenu:
+		return ui.RenderMenu(ui.MenuParams{
+			Title:  "Инструменты для DevOps",
+			Items:  m.rootMenu,
+			Cursor: m.cursor,
+			Width:  m.width,
+			Height: m.height,
+		})
 
-	// =========================
-	// MENU
-	// =========================
-	if m.state == 0 {
-		out.WriteString(fmt.Sprintf("%s\n  🐧 LINUX GUIDE (CYBER)\n%s\n\n", styleTitle, styleReset))
-
-		for i, item := range m.menuItems {
-			cursor := " "
-			color := styleItem
-
-			if i == m.cursor {
-				cursor = "❯"
-				color = styleCursor
-			}
-
-			out.WriteString(fmt.Sprintf("  %s %s%s%s\n",
-				cursor,
-				color,
-				item,
-				styleReset,
-			))
-		}
-
-		out.WriteString("\n  ↑↓ / j k • Enter • q")
-		return out.String()
+	case stateSubMenu:
+		return ui.RenderMenu(ui.MenuParams{
+			Title:    m.menuTitle(),
+			Subtitle: m.menuSubtitle(),
+			Items:    m.activeItems(),
+			Cursor:   m.cursor,
+			Width:    m.width,
+			Height:   m.height,
+		})
 	}
 
-	// =========================
-	// INIT CONTENT
-	// =========================
 	if len(m.lines) == 0 && m.currentSection != nil {
-		m.lines = buildLines(m)
+		m.lines = ui.BuildSectionLines(m.currentSection)
 	}
 
-	// =========================
-	// AUTO HEIGHT
-	// =========================
-	height := m.height
-	if height <= 0 {
-		height = 25
-	}
-
-	// =========================
-	// CLAMP SCROLL
-	// =========================
-	maxScroll := len(m.lines) - height
-	if maxScroll < 0 {
-		maxScroll = 0
-	}
-
-	if m.scroll < 0 {
-		m.scroll = 0
-	}
-
-	if m.scroll > maxScroll {
-		m.scroll = maxScroll
-	}
-
-	end := m.scroll + height
-	if end > len(m.lines) {
-		end = len(m.lines)
-	}
-
-	return strings.Join(m.lines[m.scroll:end], "\n")
-}
-
-func buildLines(m model) []string {
-	var out []string
-
-	line := strings.Repeat("─", 60)
-
-	out = append(out,
-		styleTitle+line+styleReset,
-		"  "+styleHeader+m.currentSection.Title+styleReset,
-		styleTitle+line+styleReset,
-	)
-
-	for _, item := range m.currentSection.Items {
-
-		switch item.Type {
-
-		case data.TypeHeader:
-			out = append(out, "", styleHeader+item.Value+styleReset)
-
-		case data.TypeCmd:
-			out = append(out,
-				"  "+styleCmdKey+"$ "+item.Value+styleReset,
-			)
-
-			if item.Desc != "" {
-				out = append(out,
-					"     "+styleDesc+"→ "+item.Desc+styleReset,
-				)
-			}
-
-		case data.TypeKey:
-			out = append(out,
-				"     "+styleKeyFlag+"["+item.Key+"] "+styleReset+item.Desc,
-			)
-		}
-	}
-
-	return out
+	return ui.RenderContent(ui.ContentParams{
+		Title:      m.currentSection.Title,
+		Breadcrumb: m.breadcrumb(),
+		Lines:      m.lines,
+		Scroll:     m.clampScroll(),
+		Width:      m.width,
+		Height:     m.height,
+	})
 }
 
 func main() {

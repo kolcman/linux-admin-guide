@@ -1,4 +1,4 @@
-package data
+package docker
 
 const (
 	TypeCmd    = "cmd"
