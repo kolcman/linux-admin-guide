@@ -195,6 +195,19 @@ func lipglossJoinVertical(parts ...string) string {
 	return strings.Join(parts, "\n")
 }
 
+func renderTip(value string) []string {
+	lines := strings.Split(value, "\n")
+	out := make([]string, len(lines))
+	for i, line := range lines {
+		prefix := "💡  "
+		if i > 0 {
+			prefix = "    "
+		}
+		out[i] = styles.Tip.Render(prefix + line)
+	}
+	return out
+}
+
 func BuildSectionLines(section *data.Section) []string {
 	if section == nil {
 		return nil
@@ -209,7 +222,7 @@ func BuildSectionLines(section *data.Section) []string {
 			out = append(out, "", styles.BlockHeader.Render(item.Value))
 
 		case data.TypeTip:
-			out = append(out, styles.Tip.Render("💡  "+item.Value))
+			out = append(out, renderTip(item.Value)...)
 
 		case data.TypeWarn:
 			out = append(out, styles.Warn.Render("⚠️  "+item.Value))

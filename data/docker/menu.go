@@ -2,6 +2,7 @@ package docker
 
 func Submenu() []MenuItem {
 	return []MenuItem{
+		{Title: "📄 Dockerfile", Section: &DockerfileSection},
 		{Title: "🐳 Docker", Children: dockerBasicsSubmenu()},
 		{Title: "🐳 Docker Compose", Section: &ComposeSection},
 		{Title: "🐝 Docker Swarm", Section: &SwarmSection},

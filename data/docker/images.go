@@ -4,7 +4,7 @@ var ImagesSection = Section{
 	Title: "📦 ОБРАЗЫ",
 	Items: []Item{
 		{Type: TypeTip, Value: "Образ (image) — шаблон приложения. Из одного образа можно запустить много контейнеров."},
-		{Type: TypeTip, Value: "Образы хранятся на диске сервера. Скачиваются из Docker Hub или собираются из Dockerfile."},
+		{Type: TypeTip, Value: "Свой образ собирают из Dockerfile — см. раздел 📄 Dockerfile в меню Docker."},
 
 		{Type: TypeHeader, Value: "📋 Список образов"},
 		{Type: TypeKey, Key: "-a", Desc: "все образы, включая промежуточные слои"},
@@ -18,12 +18,8 @@ var ImagesSection = Section{
 		{Type: TypeCmd, Value: "docker pull nginx", Desc: "скачать последнюю версию nginx"},
 		{Type: TypeCmd, Value: "docker pull nginx:1.25", Desc: "скачать конкретную версию"},
 
-		{Type: TypeHeader, Value: "🔨 Сборка своего образа"},
-		{Type: TypeKey, Key: "-t", Desc: "tag — имя и версия образа (myapp:v1)"},
-		{Type: TypeKey, Key: "-f", Desc: "указать другой Dockerfile"},
-		{Type: TypeKey, Key: ".", Desc: "контекст сборки — папка с Dockerfile"},
-		{Type: TypeCmd, Value: "docker build -t myapp:latest .", Desc: "собрать образ из Dockerfile в текущей папке"},
-		{Type: TypeCmd, Value: "docker build -t myapp:v1 -f Dockerfile.prod .", Desc: "сборка из другого файла"},
+		{Type: TypeHeader, Value: "🔨 Быстрая сборка"},
+		{Type: TypeCmd, Value: "docker build -t myapp:latest .", Desc: "подробности — в разделе 📄 Dockerfile"},
 
 		{Type: TypeHeader, Value: "🗑️ Удаление"},
 		{Type: TypeKey, Key: "-a", Desc: "удалить все неиспользуемые образы"},
