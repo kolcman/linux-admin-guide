@@ -2,6 +2,8 @@ package data
 
 func GetMenu() []MenuItem {
 	return []MenuItem{
+		{Title: FilesSection.Title, Section: &FilesSection},
+		{Title: BashSection.Title, Section: &BashSection},
 		{Title: DisksSection.Title, Section: &DisksSection},
 		{Title: FirewallSection.Title, Section: &FirewallSection},
 		{Title: UsersSection.Title, Section: &UsersSection},
