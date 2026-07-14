@@ -4,6 +4,8 @@ func GetMenu() []MenuItem {
 	return []MenuItem{
 		{Title: FilesSection.Title, Section: &FilesSection},
 		{Title: BashSection.Title, Section: &BashSection},
+		{Title: TextSection.Title, Section: &TextSection},
+		{Title: RegexSection.Title, Section: &RegexSection},
 		{Title: DisksSection.Title, Section: &DisksSection},
 		{Title: FirewallSection.Title, Section: &FirewallSection},
 		{Title: UsersSection.Title, Section: &UsersSection},
