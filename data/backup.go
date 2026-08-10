@@ -3,20 +3,39 @@ package data
 var BackupSection = Section{
 	Title: "📦 БЭКАПЫ",
 	Items: []Item{
-		// TAR.GZ
-		{Type: TypeCmd, Value: "tar -czvf archive.tar.gz folder/", Desc: "Создать TAR.GZ архив"},
-		{Type: TypeCmd, Value: "tar -xzvf archive.tar.gz", Desc: "Распаковать TAR.GZ архив"},
+		{Type: TypeTip, Value: "Бэкап — не «когда всё упало», а привычка.\nМинимум: уметь собрать архив нужных каталогов и синхронизировать через rsync."},
 
-		// ZIP
-		{Type: TypeCmd, Value: "zip -r archive.zip folder/", Desc: "Создать ZIP архив"},
-		{Type: TypeCmd, Value: "unzip archive.zip", Desc: "Распаковать ZIP архив"},
+		{Type: TypeHeader, Value: "📦 TAR.GZ"},
+		{Type: TypeKey, Key: "-c", Desc: "создать архив"},
+		{Type: TypeKey, Key: "-x", Desc: "извлечь"},
+		{Type: TypeKey, Key: "-z", Desc: "gzip-сжатие"},
+		{Type: TypeKey, Key: "-v", Desc: "показывать файлы"},
+		{Type: TypeKey, Key: "-f", Desc: "имя файла архива"},
+		{Type: TypeCmd, Value: "tar -czvf archive.tar.gz folder/", Desc: "создать TAR.GZ архив"},
+		{Type: TypeCmd, Value: "tar -xzvf archive.tar.gz", Desc: "распаковать TAR.GZ"},
+		{Type: TypeCmd, Value: "tar -czvf backup.tar.gz --exclude='node_modules' --exclude='.git' project/", Desc: "архив без мусора"},
 
-		// 7Z
-		{Type: TypeCmd, Value: "7z a archive.7z folder/", Desc: "Создать 7Z архив"},
-		{Type: TypeCmd, Value: "7z x archive.7z", Desc: "Распаковать 7Z архив"},
+		{Type: TypeHeader, Value: "📦 ZIP / 7Z"},
+		{Type: TypeCmd, Value: "zip -r archive.zip folder/", Desc: "создать ZIP архив"},
+		{Type: TypeCmd, Value: "unzip archive.zip", Desc: "распаковать ZIP"},
+		{Type: TypeCmd, Value: "7z a archive.7z folder/", Desc: "создать 7Z архив"},
+		{Type: TypeCmd, Value: "7z x archive.7z", Desc: "распаковать 7Z"},
 
-		// Бэкапы
-		{Type: TypeCmd, Value: "rsync -avh src/ dst/", Desc: "Синхронизация папок"},
-		{Type: TypeCmd, Value: "crontab -e", Desc: "Редактор планировщика задач"},
+		{Type: TypeHeader, Value: "🔄 rsync"},
+		{Type: TypeKey, Key: "-a", Desc: "архивный режим: права, времена, рекурсия"},
+		{Type: TypeKey, Key: "-v", Desc: "подробный вывод"},
+		{Type: TypeKey, Key: "-h", Desc: "размеры по-человечески"},
+		{Type: TypeKey, Key: "--delete", Desc: "удалить в dst то, чего нет в src (зеркало)"},
+		{Type: TypeKey, Key: "--dry-run", Desc: "показать, что сделает, без копирования"},
+		{Type: TypeCmd, Value: "rsync -avh src/ dst/", Desc: "синхронизация папок"},
+		{Type: TypeCmd, Value: "rsync -avh --delete src/ dst/", Desc: "зеркало: dst станет как src"},
+		{Type: TypeCmd, Value: "rsync -avh -e ssh src/ user@host:/backup/", Desc: "бэкап на удалённый сервер по SSH"},
+		{Type: TypeWarn, Value: "Слеш в конце важен: src/ — содержимое папки; src — сама папка целиком.\n--delete опасен: сначала --dry-run."},
+
+		{Type: TypeHeader, Value: "⏰ cron"},
+		{Type: TypeCmd, Value: "crontab -e", Desc: "редактор своих задач"},
+		{Type: TypeCmd, Value: "crontab -l", Desc: "список задач"},
+		{Type: TypeTip, Value: "Формат: мин час день месяц день_недели команда\n0 3 * * * /usr/local/bin/backup.sh\n= каждый день в 03:00"},
+		{Type: TypeTip, Value: "Логи cron часто в /var/log/syslog или journalctl -u cron.\nПеренаправляй вывод скрипта: >> /var/log/backup.log 2>&1"},
 	},
 }

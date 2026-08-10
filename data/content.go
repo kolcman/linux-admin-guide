@@ -12,5 +12,7 @@ func GetAllSections() map[int]Section {
 		7:  ServicesSection,
 		8:  PackagesSection,
 		9:  GitLabSection,
+		10: ProcessesSection,
+		11: BootSection,
 	}
 }

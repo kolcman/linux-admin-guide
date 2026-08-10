@@ -1,7 +1,7 @@
 package data
 
 var BashSection = Section{
-	Title: "🐚 ЯЗЫК BASH — СКРИПТЫ",
+	Title: "🐚 BASH — СКРИПТЫ И РЕДИРЕКТЫ",
 	Items: []Item{
 		{Type: TypeTip, Value: "Bash — язык для .sh скриптов: автодеплой, бэкапы, cron-задачи. Файл начинается с #!/bin/bash (shebang)."},
 		{Type: TypeTip, Value: "Запуск: chmod +x script.sh && ./script.sh\nИли: bash script.sh (без chmod)"},
@@ -106,12 +106,30 @@ var BashSection = Section{
 		{Type: TypeKey, Key: ">&2", Desc: "вывести сообщение в stderr (для ошибок)"},
 		{Type: TypeTip, Value: "if ! docker ps &>/dev/null; then\n  echo \"Docker не запущен\" >&2\n  exit 1\nfi"},
 
-		{Type: TypeHeader, Value: "🔗 В скрипте: пайпы и &&"},
+		{Type: TypeHeader, Value: "📤 Потоки и редиректы"},
+		{Type: TypeTip, Value: "Три потока: stdin (0) — ввод, stdout (1) — вывод, stderr (2) — ошибки.\n> перезаписывает файл, >> дописывает."},
+		{Type: TypeKey, Key: "cmd > file", Desc: "stdout в файл (перезапись)"},
+		{Type: TypeKey, Key: "cmd >> file", Desc: "stdout дописать в конец"},
+		{Type: TypeKey, Key: "cmd < file", Desc: "файл как stdin"},
+		{Type: TypeKey, Key: "cmd 2> file", Desc: "stderr в файл (перезапись)"},
+		{Type: TypeKey, Key: "cmd 2>> file", Desc: "stderr дописать в конец"},
+		{Type: TypeKey, Key: "cmd &> file", Desc: "stdout и stderr вместе в файл"},
+		{Type: TypeKey, Key: "cmd 2>&1", Desc: "stderr в тот же поток, что и stdout"},
+		{Type: TypeCmd, Value: "cmd >out.txt 2>err.txt", Desc: "развести вывод и ошибки по разным файлам"},
+		{Type: TypeTip, Value: "Частые ошибки в stderr: No such file, Permission denied, Is a directory.\nstdout и stderr — разные потоки: можно сохранить нормальный вывод и отдельно логировать ошибки."},
+
+		{Type: TypeHeader, Value: "🔗 Пайпы и &&"},
+		{Type: TypeTip, Value: "| берёт stdout левой команды и подаёт на stdin правой.\nstderr по умолчанию НЕ идёт в трубу — пока не сделаешь 2>&1."},
 		{Type: TypeKey, Key: "|", Desc: "передать вывод в следующую команду"},
 		{Type: TypeKey, Key: "&&", Desc: "следующая команда только при успехе"},
 		{Type: TypeKey, Key: "||", Desc: "следующая команда только при ошибке"},
 		{Type: TypeKey, Key: "cmd &>/dev/null", Desc: "скрыть весь вывод (stdout + stderr)"},
-		{Type: TypeTip, Value: "mkdir -p logs && cd logs || exit 1"},
+		{Type: TypeCmd, Value: "ps aux | grep nginx", Desc: "процессы, в имени/команде есть nginx"},
+		{Type: TypeCmd, Value: "cat file.log | grep ERROR | wc -l", Desc: "сколько строк с ERROR (лучше: grep -c)"},
+		{Type: TypeCmd, Value: "sort file.txt | uniq -c | sort -nr", Desc: "частоты строк по убыванию"},
+		{Type: TypeCmd, Value: "cmd | tee out.txt", Desc: "и на экран, и в файл одновременно"},
+		{Type: TypeCmd, Value: "cmd 2>&1 | tee all.log", Desc: "stdout+stderr в конвейер и в лог"},
+		{Type: TypeTip, Value: "| — между командами. > / >> — в файл. Часто вместе: cmd1 | cmd2 > result.txt\nmkdir -p logs && cd logs || exit 1"},
 
 		{Type: TypeHeader, Value: "📜 Пример: простой деплой"},
 		{Type: TypeTip, Value: "#!/bin/bash\nset -euo pipefail\n\nENV=\"${1:-prod}\"\necho \"Деплой в $ENV\"\n\ncd /app\ngit pull\ndocker compose -f \"docker-compose.${ENV}.yml\" up -d --build\necho \"Готово\""},

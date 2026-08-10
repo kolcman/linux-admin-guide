@@ -15,9 +15,13 @@ var SSHSection = Section{
 		{Type: TypeKey, Key: "-R <rem>:<loc>", Desc: "Обратный туннель (доступ к своему ПК)"},
 		{Type: TypeKey, Key: "-D <port>", Desc: "SOCKS прокси через сервер"},
 
-		{Type: TypeHeader, Value: "🛠️ Управление:"},
+		{Type: TypeHeader, Value: "🛠️ Управление"},
 		{Type: TypeCmd, Value: "ssh-keygen -t ed25519 -C 'my_pc'", Desc: "Генерация современного ключа"},
 		{Type: TypeCmd, Value: "ssh-copy-id user@host", Desc: "Быстрая отправка ключа на сервер"},
 		{Type: TypeCmd, Value: "sudo systemctl restart sshd", Desc: "Перезапуск службы после правки конфига"},
+
+		{Type: TypeHeader, Value: "📄 Конфиг клиента (~/.ssh/config)"},
+		{Type: TypeTip, Value: "Host myserver\n  HostName 203.0.113.10\n  User admin\n  Port 2222\n  IdentityFile ~/.ssh/id_ed25519\n\nПотом просто: ssh myserver"},
+		{Type: TypeWarn, Value: "На сервере в /etc/ssh/sshd_config не оставляй PasswordAuthentication yes и PermitRootLogin yes на продакшене без нужды."},
 	},
 }
