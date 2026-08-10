@@ -10,7 +10,7 @@ func GetMenu() []MenuItem {
 		{Title: ProcessesSection.Title, Section: &ProcessesSection},
 		{Title: ServicesSection.Title, Section: &ServicesSection},
 		{Title: BootSection.Title, Section: &BootSection},
-		{Title: UsersSection.Title, Section: &UsersSection},
+		{Title: "👤 ПОЛЬЗОВАТЕЛИ И ГРУППЫ", Children: usersSubmenu()},
 		{Title: NetworkSection.Title, Section: &NetworkSection},
 		{Title: FirewallSection.Title, Section: &FirewallSection},
 		{Title: SSHSection.Title, Section: &SSHSection},
