@@ -2,141 +2,142 @@ package ui
 
 import "github.com/charmbracelet/lipgloss"
 
-// Палитра в духе продуктового CLI (256-color, SSH-safe).
-const (
-	colorPrimary     = "111" // sky blue — бренд, активное меню
-	colorSecondary   = "177" // lilac — заголовки блоков
-	colorText        = "254"
-	colorMuted       = "243"
-	colorCmdVerb     = "252" // команда (docker, run)
-	colorCmdArg      = "117" // аргументы (nginx, пути)
-	colorFlag        = "227" // жёлтые флаги -a, --name
-	colorPlaceholder = "218" // <id>, <image>
-	colorConcept     = "141" // подкоманды: up, prune, bridge
-	colorTip         = "245"
-	colorWarn        = "209"
-	colorBorder      = "238"
-	colorDim         = "240"
-	colorPrompt      = "86" // $ prompt
+// Адаптивная палитра: Light — для белого/светлого фона терминала,
+// Dark — для тёмного. Иначе на дневной теме почти белый текст не читается.
+var (
+	colorPrimary     = lipgloss.AdaptiveColor{Light: "25", Dark: "111"}  // синий акцент
+	colorSecondary   = lipgloss.AdaptiveColor{Light: "90", Dark: "177"}  // заголовки
+	colorText        = lipgloss.AdaptiveColor{Light: "232", Dark: "254"} // основной текст
+	colorMuted       = lipgloss.AdaptiveColor{Light: "238", Dark: "245"} // подписи / desc
+	colorCmdVerb     = lipgloss.AdaptiveColor{Light: "17", Dark: "252"}  // команда
+	colorCmdArg      = lipgloss.AdaptiveColor{Light: "23", Dark: "117"}  // аргументы
+	colorFlag        = lipgloss.AdaptiveColor{Light: "130", Dark: "227"} // флаги -a, --name
+	colorPlaceholder = lipgloss.AdaptiveColor{Light: "125", Dark: "218"} // <id>
+	colorConcept     = lipgloss.AdaptiveColor{Light: "54", Dark: "141"}  // подкоманды
+	colorTip         = lipgloss.AdaptiveColor{Light: "236", Dark: "250"}
+	colorWarn        = lipgloss.AdaptiveColor{Light: "160", Dark: "209"}
+	colorBorder      = lipgloss.AdaptiveColor{Light: "242", Dark: "238"}
+	colorDim         = lipgloss.AdaptiveColor{Light: "241", Dark: "244"}
+	colorPrompt      = lipgloss.AdaptiveColor{Light: "22", Dark: "86"} // $
 )
 
 type Styles struct {
-	AppTitle     lipgloss.Style
-	AppSubtitle  lipgloss.Style
-	Panel        lipgloss.Style
+	AppTitle       lipgloss.Style
+	AppSubtitle    lipgloss.Style
+	Panel          lipgloss.Style
 	MenuNormal     lipgloss.Style
 	MenuActive     lipgloss.Style
 	MenuActiveLine lipgloss.Style
 	Footer         lipgloss.Style
-	FooterKey    lipgloss.Style
-	Breadcrumb   lipgloss.Style
-	SectionTitle lipgloss.Style
-	BlockHeader  lipgloss.Style
-	CmdVerb      lipgloss.Style
-	CmdArg       lipgloss.Style
-	CmdPrompt    lipgloss.Style
-	Desc         lipgloss.Style
-	KeyFlag      lipgloss.Style
-	KeyConcept   lipgloss.Style
-	KeyLabel     lipgloss.Style
-	Placeholder  lipgloss.Style
-	Tip          lipgloss.Style
-	Warn         lipgloss.Style
-	ScrollHint   lipgloss.Style
-	Divider      lipgloss.Style
+	FooterKey      lipgloss.Style
+	Breadcrumb     lipgloss.Style
+	SectionTitle   lipgloss.Style
+	BlockHeader    lipgloss.Style
+	CmdVerb        lipgloss.Style
+	CmdArg         lipgloss.Style
+	CmdPrompt      lipgloss.Style
+	Desc           lipgloss.Style
+	KeyFlag        lipgloss.Style
+	KeyConcept     lipgloss.Style
+	KeyLabel       lipgloss.Style
+	Placeholder    lipgloss.Style
+	Tip            lipgloss.Style
+	Warn           lipgloss.Style
+	ScrollHint     lipgloss.Style
+	Divider        lipgloss.Style
 }
 
 func NewStyles() Styles {
 	return Styles{
 		AppTitle: lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color(colorPrimary)),
+			Foreground(colorPrimary),
 
 		AppSubtitle: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorMuted)).
+			Foreground(colorMuted).
 			Italic(true),
 
 		Panel: lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color(colorBorder)).
+			BorderForeground(colorBorder).
 			Padding(1, 2),
 
 		MenuNormal: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorText)).
+			Foreground(colorText).
 			Padding(0, 1),
 
 		MenuActive: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorPrimary)).
+			Foreground(colorPrimary).
 			Bold(true).
 			Padding(0, 1),
 
 		MenuActiveLine: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorPrimary)).
+			Foreground(colorPrimary).
 			Padding(0, 1),
 
 		Footer: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorMuted)),
+			Foreground(colorMuted),
 
 		FooterKey: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorPrimary)).
+			Foreground(colorPrimary).
 			Bold(true),
 
 		Breadcrumb: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorMuted)),
+			Foreground(colorMuted),
 
 		SectionTitle: lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color(colorSecondary)),
+			Foreground(colorSecondary),
 
 		BlockHeader: lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color(colorSecondary)).
+			Foreground(colorSecondary).
 			MarginTop(1),
 
 		CmdVerb: lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color(colorCmdVerb)),
+			Foreground(colorCmdVerb),
 
 		CmdArg: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorCmdArg)),
+			Foreground(colorCmdArg),
 
 		CmdPrompt: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorPrompt)).
+			Foreground(colorPrompt).
 			Bold(true),
 
 		Desc: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorMuted)).
+			Foreground(colorMuted).
 			PaddingLeft(4),
 
 		KeyFlag: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorFlag)).
+			Foreground(colorFlag).
 			Bold(true),
 
 		KeyConcept: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorConcept)).
+			Foreground(colorConcept).
 			Bold(true),
 
 		KeyLabel: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorMuted)),
+			Foreground(colorMuted),
 
 		Placeholder: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorPlaceholder)).
+			Foreground(colorPlaceholder).
 			Italic(true),
 
 		Tip: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorTip)).
+			Foreground(colorTip).
 			Italic(true).
 			PaddingLeft(2),
 
 		Warn: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorWarn)).
+			Foreground(colorWarn).
 			Bold(true).
 			PaddingLeft(2),
 
 		ScrollHint: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorDim)),
+			Foreground(colorDim),
 
 		Divider: lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colorBorder)),
+			Foreground(colorBorder),
 	}
 }
