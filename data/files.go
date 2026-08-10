@@ -1,7 +1,8 @@
 package data
 
-var FilesSection = Section{
-	Title: "📁 ФАЙЛЫ И КАТАЛОГИ",
+// FilesBasicsSection — пути, навигация, ls.
+var FilesBasicsSection = Section{
+	Title: "📍 НАВИГАЦИЯ И ПРОСМОТР",
 	Items: []Item{
 		{Type: TypeTip, Value: "В Linux всё — файл или каталог. Путь / — корень системы, ~ — твоя домашняя папка (/home/user)."},
 		{Type: TypeTip, Value: ". — текущая папка, .. — родительская. Абсолютный путь начинается с /, относительный — с текущей папки."},
@@ -24,6 +25,16 @@ var FilesSection = Section{
 		{Type: TypeCmd, Value: "ls -lt", Desc: "последние изменённые файлы сверху"},
 		{Type: TypeCmd, Value: "ls -li file", Desc: "номер inode (нужен для hard link / отладки ФС)"},
 
+		{Type: TypeHeader, Value: "💡 Советы"},
+		{Type: TypeTip, Value: "Пути с пробелами — в кавычках: cd \"My Documents\" или cd My\\ Documents"},
+		{Type: TypeTip, Value: "Tab — автодополнение имён. Дважды Tab — показать варианты."},
+	},
+}
+
+// FilesEditSection — создать, читать, копировать, перемещать, удалять.
+var FilesEditSection = Section{
+	Title: "📄 СОЗДАТЬ / КОПИРОВАТЬ / УДАЛИТЬ",
+	Items: []Item{
 		{Type: TypeHeader, Value: "📂 Создание каталогов (mkdir)"},
 		{Type: TypeKey, Key: "-p", Desc: "создать всю цепочку папок (mkdir -p a/b/c)"},
 		{Type: TypeKey, Key: "-m 750", Desc: "создать сразу с правами"},
@@ -65,8 +76,14 @@ var FilesSection = Section{
 		{Type: TypeCmd, Value: "rm -r folder/", Desc: "удалить папку и всё внутри"},
 		{Type: TypeCmd, Value: "rmdir empty_dir/", Desc: "удалить только пустой каталог"},
 		{Type: TypeWarn, Value: "rm -rf — безвозвратно! Нет корзины. Дважды проверь путь."},
+	},
+}
 
-		{Type: TypeHeader, Value: "🔍 Поиск файлов (find)"},
+// FilesSearchSection — find, locate, which.
+var FilesSearchSection = Section{
+	Title: "🔍 ПОИСК ФАЙЛОВ",
+	Items: []Item{
+		{Type: TypeHeader, Value: "🔍 find"},
 		{Type: TypeTip, Value: "find [папка] [параметры] критерий шаблон\nОбходит дерево сейчас — медленнее locate, но всегда актуально.\nШаблон с * — в кавычках, иначе shell развернёт его раньше find."},
 		{Type: TypeKey, Key: "-name / -iname", Desc: "по имени (маска *); iname — без учёта регистра"},
 		{Type: TypeKey, Key: "-type f / -type d", Desc: "только файлы / только каталоги"},
@@ -102,7 +119,13 @@ var FilesSection = Section{
 		{Type: TypeTip, Value: "which ищет только исполняемые в PATH. Конфиг в /etc — через find/locate."},
 		{Type: TypeCmd, Value: "which python3", Desc: "какой python3 возьмёт shell"},
 		{Type: TypeCmd, Value: "which -a python3", Desc: "все пути к python3 в PATH"},
+	},
+}
 
+// FilesMetaSection — ссылки, размер, тип, diff, FHS.
+var FilesMetaSection = Section{
+	Title: "🔗 ССЫЛКИ И МЕТАДАННЫЕ",
+	Items: []Item{
 		{Type: TypeHeader, Value: "🔗 Ссылки (ln)"},
 		{Type: TypeKey, Key: "-s", Desc: "символическая ссылка (как ярлык в Windows)"},
 		{Type: TypeCmd, Value: "ln -s /path/to/target linkname", Desc: "создать символическую ссылку"},
@@ -132,7 +155,13 @@ var FilesSection = Section{
 		{Type: TypeHeader, Value: "🌳 Дерево FHS (куда что кладут)"},
 		{Type: TypeTip, Value: "/ — корень. /etc — конфиги. /var/log — логи. /home — домашки.\n/tmp — временное. /usr — программы. /opt — стороннее ПО. /dev — устройства."},
 		{Type: TypeCmd, Value: "ls /", Desc: "что лежит в корне"},
+	},
+}
 
+// FilesPermsSection — chmod, chown, маски.
+var FilesPermsSection = Section{
+	Title: "🔐 ПРАВА И МАСКИ",
+	Items: []Item{
 		{Type: TypeHeader, Value: "🔐 Права доступа (chmod / chown)"},
 		{Type: TypeTip, Value: "Права: r (чтение=4), w (запись=2), x (выполнение=1). Три группы: владелец / группа / остальные."},
 		{Type: TypeTip, Value: "755 = rwxr-xr-x — владелец всё, остальные читают и заходят в папку.\n644 = rw-r--r-- — файл: владелец пишет, все читают."},
@@ -148,9 +177,17 @@ var FilesSection = Section{
 		{Type: TypeKey, Key: "{a,b}", Desc: "перечисление: cp file.{txt,bak} backup/"},
 		{Type: TypeCmd, Value: "ls -la /etc/nginx/", Desc: "пример: конкретный путь + скрытые файлы"},
 
-		{Type: TypeHeader, Value: "💡 Советы новичку"},
-		{Type: TypeTip, Value: "Пути с пробелами — в кавычках: cd \"My Documents\" или cd My\\ Documents"},
-		{Type: TypeTip, Value: "Tab — автодополнение имён файлов и команд. Дважды Tab — показать варианты."},
+		{Type: TypeHeader, Value: "💡 Советы"},
 		{Type: TypeWarn, Value: "Не работай от root без нужды. sudo — только для конкретной команды."},
 	},
+}
+
+func filesSubmenu() []MenuItem {
+	return []MenuItem{
+		{Title: FilesBasicsSection.Title, Section: &FilesBasicsSection},
+		{Title: FilesEditSection.Title, Section: &FilesEditSection},
+		{Title: FilesSearchSection.Title, Section: &FilesSearchSection},
+		{Title: FilesMetaSection.Title, Section: &FilesMetaSection},
+		{Title: FilesPermsSection.Title, Section: &FilesPermsSection},
+	}
 }

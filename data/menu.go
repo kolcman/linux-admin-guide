@@ -2,7 +2,7 @@ package data
 
 func GetMenu() []MenuItem {
 	return []MenuItem{
-		{Title: FilesSection.Title, Section: &FilesSection},
+		{Title: "📁 ФАЙЛЫ И КАТАЛОГИ", Children: filesSubmenu()},
 		{Title: BashSection.Title, Section: &BashSection},
 		{Title: TextSection.Title, Section: &TextSection},
 		{Title: RegexSection.Title, Section: &RegexSection},
