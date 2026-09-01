@@ -34,7 +34,7 @@ var FilesBasicsSection = Section{
 		{Type: TypeCmd, Value: "ls -la *.jpeg", Desc: "все jpeg в текущей папке"},
 		{Type: TypeCmd, Value: "ls *", Desc: "все имена в текущей папке"},
 		{Type: TypeCmd, Value: "ls -la *.???x", Desc: "docx, pptx, xlsx — 4 буквы, на конце x"},
-		{Type: TypeWarn, Value: "Кавычки запрещают глоббинг: '*.jpeg' останется звёздочкой. Для find шаблон как раз в кавычках."}
+		{Type: TypeWarn, Value: "Кавычки запрещают глоббинг: '*.jpeg' останется звёздочкой. Для find шаблон как раз в кавычках."},
 
 		{Type: TypeHeader, Value: "💡 Советы"},
 		{Type: TypeTip, Value: "Пути с пробелами — в кавычках: cd \"My Documents\" или cd My\\ Documents"},
