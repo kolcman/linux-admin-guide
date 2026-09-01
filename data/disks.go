@@ -13,6 +13,8 @@ var DisksSection = Section{
 
 		{Type: TypeHeader, Value: "👀 Посмотреть диски"},
 		{Type: TypeCmd, Value: "lsblk -f", Desc: "дерево дисков, UUID и mountpoint — начинай с этого"},
+		{Type: TypeCmd, Value: "lsblk -m", Desc: "права и владелец блочных устройств"},
+		{Type: TypeCmd, Value: "lsblk -o NAME,SIZE,TYPE,MOUNTPOINT", Desc: "только выбранные колонки"},
 		{Type: TypeCmd, Value: "sudo fdisk -l", Desc: "детальная таблица разделов (GPT/MBR)"},
 		{Type: TypeCmd, Value: "df -h", Desc: "свободное место на смонтированных томах"},
 		{Type: TypeCmd, Value: "df -i", Desc: "занятость inode (могут кончиться раньше гигабайтов)"},
@@ -32,6 +34,8 @@ var DisksSection = Section{
 		{Type: TypeCmd, Value: "sudo mount /dev/sdb1 /mnt/data", Desc: "обычный mount раздела"},
 		{Type: TypeCmd, Value: "sudo mount -t ext4 -o ro /dev/sdb1 /mnt/data", Desc: "явно ext4, только чтение"},
 		{Type: TypeCmd, Value: "sudo mount --bind /home/share /mnt/share", Desc: "тот же каталог виден ещё в /mnt/share"},
+		{Type: TypeCmd, Value: "sudo mount --rbind /home /mnt/home", Desc: "bind вместе с вложенными mount"},
+		{Type: TypeCmd, Value: "sudo mount -v -o remount,rw /", Desc: "перемонтировать корень RW, подробно"},
 		{Type: TypeCmd, Value: "sudo mount -a", Desc: "применить fstab"},
 		{Type: TypeCmd, Value: "sudo umount /mnt/data", Desc: "отмонтировать (устройство или точка)"},
 

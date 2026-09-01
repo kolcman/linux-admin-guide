@@ -25,6 +25,7 @@ var FirewallSection = Section{
 		{Type: TypeCmd, Value: "sudo iptables -Z", Desc: "Сбросить счетчики пакетов в ноль"},
 
 		{Type: TypeHeader, Value: "⚙️ Важные настройки:"},
+		{Type: TypeCmd, Value: "sudo ufw status", Desc: "текущие правила"},
 		{Type: TypeCmd, Value: "sudo ufw default deny incoming", Desc: "Политика: запрещать всё входящее по умолчанию"},
 		{Type: TypeCmd, Value: "sudo ufw enable", Desc: "Включить файрвол (подтвердите действие)"},
 	},

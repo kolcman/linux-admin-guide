@@ -34,6 +34,7 @@ var UsersCreateSection = Section{
 		{Type: TypeKey, Key: "-i", Desc: "дней после просрочки до неактивности учётки"},
 		{Type: TypeCmd, Value: "sudo passwd -S alice", Desc: "статус пароля"},
 		{Type: TypeCmd, Value: "sudo passwd -e alice", Desc: "потребовать смену пароля при входе"},
+		{Type: TypeCmd, Value: "sudo passwd -n 7 -x 90 -w 7 alice", Desc: "min 7 / max 90 дней, warn за 7"},
 
 		{Type: TypeHeader, Value: "📅 chage — срок пароля"},
 		{Type: TypeKey, Key: "-l", Desc: "показать текущую политику"},
@@ -43,6 +44,7 @@ var UsersCreateSection = Section{
 		{Type: TypeCmd, Value: "sudo chage -l alice", Desc: "политика пароля alice"},
 		{Type: TypeCmd, Value: "sudo chage -M 90 -W 7 alice", Desc: "пароль max 90 дней, warn за 7"},
 		{Type: TypeCmd, Value: "sudo chage -E 2026-12-31 alice", Desc: "учётка до указанной даты"},
+		{Type: TypeCmd, Value: "sudo chage -I 14 alice", Desc: "14 дней неактивности после просрочки пароля"},
 	},
 }
 
@@ -51,6 +53,8 @@ var UsersGroupsSection = Section{
 	Title: "👥 ГРУППЫ И ИНФОРМАЦИЯ",
 	Items: []Item{
 		{Type: TypeHeader, Value: "⚙️ usermod"},
+		{Type: TypeKey, Key: "-aG", Desc: "добавить в группу, не затирая остальные"},
+		{Type: TypeKey, Key: "-L / -U", Desc: "заблокировать / разблокировать учётку"},
 		{Type: TypeCmd, Value: "sudo usermod -aG sudo username", Desc: "дать права администратора (sudo)"},
 		{Type: TypeCmd, Value: "sudo usermod -aG docker username", Desc: "дать доступ к Docker без sudo"},
 		{Type: TypeCmd, Value: "sudo usermod -L username", Desc: "заблокировать учётку (Lock)"},
@@ -99,13 +103,11 @@ var UsersSudoSection = Section{
 		{Type: TypeWarn, Value: "Не правь /etc/sudoers обычным редактором вслепую — опечатка закроет sudo.\nТолько visudo."},
 
 		{Type: TypeHeader, Value: "🔐 chmod / chown"},
-		{Type: TypeTip, Value: "Цифры одной тройки: r=4, w=2, x=1 → 7=rwx, 6=rw-, 5=r-x, 4=r--.\nТри цифры: владелец / группа / остальные (755, 644, 700).\n\nФайл: r=читать, w=писать, x=запустить.\nКаталог: r=список (ls), w=создавать/удалять внутри, x=войти (cd) и открыть по имени.\n\nТолько чтение файла: 644 или 444.\n«Невидимый» список: каталог 711 (остальным только x) — ls не видит имена,\nно cat dir/known.txt сработает. Имя с точкой (.env) — просто скрыто от ls без -a.\nПодробный разбор с примерами: Файлы → Права и маски."},
+		{Type: TypeTip, Value: "Права файлов подробно: Файлы → Права и маски."},
 		{Type: TypeCmd, Value: "chmod 755 script.sh", Desc: "владелец всё, остальные читают и запускают"},
-		{Type: TypeCmd, Value: "chmod 644 file.txt", Desc: "владелец пишет, остальные только читают"},
-		{Type: TypeCmd, Value: "chmod 444 file.txt", Desc: "всем только чтение"},
-		{Type: TypeCmd, Value: "chmod 711 hide_dir", Desc: "чужой ls без списка; доступ по известному имени возможен"},
 		{Type: TypeCmd, Value: "sudo chown alice:alice file.txt", Desc: "владелец и группа"},
 		{Type: TypeCmd, Value: "sudo chown -R www-data:www-data /var/www", Desc: "рекурсивно отдать дерево"},
+		{Type: TypeCmd, Value: "sudo chown -h alice:alice link", Desc: "сменить владельца symlink, не цели"},
 		{Type: TypeKey, Key: "-R", Desc: "chmod/chown рекурсивно"},
 		{Type: TypeKey, Key: "-h", Desc: "chown: менять symlink, а не цель"},
 	},

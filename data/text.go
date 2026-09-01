@@ -17,6 +17,8 @@ var TextSection = Section{
 		{Type: TypeCmd, Value: "grep -i \"error\" app.log", Desc: "то же, но Error и ERROR тоже"},
 		{Type: TypeCmd, Value: "grep -ri \"error\" /var/log", Desc: "искать по всей папке логов"},
 		{Type: TypeCmd, Value: "grep -n \"TODO\" main.go", Desc: "с номерами строк"},
+		{Type: TypeCmd, Value: "grep -v \"debug\" app.log", Desc: "строки БЕЗ debug"},
+		{Type: TypeCmd, Value: "grep -c \"error\" app.log", Desc: "сколько строк с error"},
 		{Type: TypeCmd, Value: "grep -E \"error|warn|fail\" app.log", Desc: "error ИЛИ warn ИЛИ fail"},
 
 		{Type: TypeHeader, Value: "✏️ sed — заменить"},
@@ -29,8 +31,6 @@ var TextSection = Section{
 		{Type: TypeKey, Key: "-E", Desc: "расширенные regex (+ ? | {} без кучи \\)"},
 		{Type: TypeKey, Key: "-e", Desc: "добавить команду (можно несколько -e подряд)"},
 		{Type: TypeKey, Key: "-f", Desc: "взять команды из файла: sed -f script.sed file.txt"},
-		{Type: TypeKey, Key: "-a", Desc: "GNU: открыть файлы после чтения скрипта (редко, для скриптов)"},
-		{Type: TypeKey, Key: "-z", Desc: "строки через \\0, а не через \\n (удобно с find -print0)"},
 
 		{Type: TypeHeader, Value: "🧩 Команды внутри sed"},
 		{Type: TypeKey, Key: "s/old/new/", Desc: "заменить первое совпадение в строке"},
@@ -49,6 +49,7 @@ var TextSection = Section{
 		{Type: TypeCmd, Value: "sed -n 's/error/ERROR/gp' app.log", Desc: "заменить и напечатать только изменённые"},
 		{Type: TypeCmd, Value: "sed '/^$/d' file.txt", Desc: "удалить пустые строки"},
 		{Type: TypeCmd, Value: "sed -e '/^#/d' -e '/^$/d' file.txt", Desc: "две команды: убрать # и пустые"},
+		{Type: TypeCmd, Value: "sed -f script.sed file.txt", Desc: "команды из файла"},
 		{Type: TypeCmd, Value: "sed '/ERROR/a\\--- next ---' app.log", Desc: "после строки с ERROR вставить --- next ---"},
 		{Type: TypeCmd, Value: "sed '/ERROR/i\\!!! ALERT !!!' app.log", Desc: "перед строкой с ERROR вставить алерт"},
 		{Type: TypeCmd, Value: "sed '3c\\эта строка заменена' file.txt", Desc: "заменить целиком 3-ю строку"},
@@ -102,18 +103,23 @@ var TextSection = Section{
 		{Type: TypeCmd, Value: "awk 'END {print NR}' file.txt", Desc: "сколько всего строк"},
 		{Type: TypeCmd, Value: "awk '{sum+=$1} END {print sum}' nums.txt", Desc: "сумма чисел в 1-й колонке"},
 		{Type: TypeCmd, Value: "awk '{printf \"Имя: %s, возраст: %s\\n\", $1, $2}' file.txt", Desc: "красивый вывод (printf)"},
-		{Type: TypeCmd, Value: "awk 'BEGIN{FS=\",\"} {print $1}' file.csv", Desc: "CSV через BEGIN{FS=...}"},
 		{Type: TypeCmd, Value: "df -h | awk 'NR>1 {print $1, $5}'", Desc: "диск и % без заголовка"},
 		{Type: TypeWarn, Value: "OFS работает только с запятой в print: print $1, $3\nБез запятой (print $1 $3) — склейка, OFS не поможет."},
 
 		{Type: TypeTip, Value: "Шаблоны поиска (email, IP, телефон…) — в разделе 🧩 РЕГУЛЯРНЫЕ ВЫРАЖЕНИЯ."},
 
+		{Type: TypeHeader, Value: "✂️ cut — взять колонку"},
+		{Type: TypeTip, Value: "cut вырезает поля. awk умеет ещё и условия."},
+		{Type: TypeKey, Key: "-f1", Desc: "первое поле (можно -f1,3 или -f2-5)"},
+		{Type: TypeKey, Key: "-d','", Desc: "разделитель (по умолчанию TAB, не пробел)"},
+		{Type: TypeCmd, Value: "cut -d: -f1 /etc/passwd", Desc: "имена пользователей"},
+		{Type: TypeCmd, Value: "cut -d',' -f1,3 people.csv", Desc: "1-я и 3-я колонки CSV"},
+
 		{Type: TypeHeader, Value: "🔗 Вместе"},
 		{Type: TypeCmd, Value: "grep -i error app.log | awk '{print $1}'", Desc: "найти error → взять 1-ю колонку"},
 		{Type: TypeCmd, Value: "grep 404 access.log | wc -l", Desc: "сколько раз был 404"},
-		{Type: TypeCmd, Value: "ps aux | grep nginx | grep -v grep", Desc: "процессы nginx"},
 
 		{Type: TypeHeader, Value: "💡 Запомнить"},
-		{Type: TypeTip, Value: "grep — ищу\nsed  — меняю\nawk  — условие {действие} + колонки $1 $2\nCSV  — не забудь -F',' или BEGIN{FS=\",\"}"},
+		{Type: TypeTip, Value: "grep — ищу\nsed  — меняю\nawk  — условие {действие} + колонки $1 $2\ncut  — колонка: -d разделитель -f номер"},
 	},
 }

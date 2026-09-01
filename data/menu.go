@@ -15,6 +15,7 @@ func GetMenu() []MenuItem {
 		{Title: FirewallSection.Title, Section: &FirewallSection},
 		{Title: SSHSection.Title, Section: &SSHSection},
 		{Title: BackupSection.Title, Section: &BackupSection},
+		{Title: CronSection.Title, Section: &CronSection},
 		{Title: PackagesSection.Title, Section: &PackagesSection},
 		{Title: "🐳 DOCKER", Children: dockerSubmenu()},
 		{Title: GitLabSection.Title, Section: &GitLabSection},

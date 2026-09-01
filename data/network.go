@@ -6,6 +6,8 @@ var NetworkSection = Section{
 		{Type: TypeTip, Value: "На хосте смотришь интерфейсы (ip), кто слушает порты (ss), есть ли связь (ping).\nСокет — «разъём» для обмена данными: TCP/UDP по сети или Unix-сокет локально."},
 
 		{Type: TypeHeader, Value: "📡 Интерфейсы и маршруты"},
+		{Type: TypeKey, Key: "-br", Desc: "ip: краткий вывод"},
+		{Type: TypeKey, Key: "-c", Desc: "ip: цветной вывод"},
 		{Type: TypeCmd, Value: "ip -br -c a", Desc: "IP-адреса интерфейсов (кратко, цвет)"},
 		{Type: TypeCmd, Value: "ip a", Desc: "подробно: адреса, MAC, состояние"},
 		{Type: TypeCmd, Value: "ip link", Desc: "состояние линка: UP/DOWN, MTU"},
@@ -26,6 +28,8 @@ var NetworkSection = Section{
 		{Type: TypeTip, Value: "Stream (TCP) — надёжный поток. Datagram (UDP) — пакеты.\nUnix-сокет — только на этой машине (часто /run/*.sock)."},
 
 		{Type: TypeHeader, Value: "📶 Проверка связи"},
+		{Type: TypeKey, Key: "-c N", Desc: "ping: сколько пакетов отправить"},
+		{Type: TypeKey, Key: "-I", Desc: "curl: только заголовки ответа"},
 		{Type: TypeCmd, Value: "ping -c 4 8.8.8.8", Desc: "есть ли выход в интернет (ICMP)"},
 		{Type: TypeCmd, Value: "ping -c 4 google.com", Desc: "связь + резолвится ли DNS"},
 		{Type: TypeCmd, Value: "traceroute google.com", Desc: "по каким хопам идёт трафик"},

@@ -9,11 +9,17 @@ var SSHSection = Section{
 		{Type: TypeKey, Key: "-v", Desc: "Режим отладки (показывает процесс handshake)"},
 		{Type: TypeKey, Key: "-N", Desc: "Не выполнять команду (только туннель)"},
 		{Type: TypeKey, Key: "-f", Desc: "Уйти в фон после подключения"},
+		{Type: TypeCmd, Value: "ssh -p 2222 user@host", Desc: "порт не 22"},
+		{Type: TypeCmd, Value: "ssh -i ~/.ssh/id_ed25519 user@host", Desc: "конкретный ключ"},
+		{Type: TypeCmd, Value: "ssh -v user@host", Desc: "отладка рукопожатия"},
 
 		{Type: TypeHeader, Value: "🚇 Туннелирование:"},
 		{Type: TypeKey, Key: "-L <loc>:<rem>", Desc: "Локальный туннель (доступ к БД сервера)"},
 		{Type: TypeKey, Key: "-R <rem>:<loc>", Desc: "Обратный туннель (доступ к своему ПК)"},
 		{Type: TypeKey, Key: "-D <port>", Desc: "SOCKS прокси через сервер"},
+		{Type: TypeCmd, Value: "ssh -N -L 5432:localhost:5432 user@host", Desc: "локальный туннель к БД"},
+		{Type: TypeCmd, Value: "ssh -N -R 8080:localhost:80 user@host", Desc: "обратный туннель"},
+		{Type: TypeCmd, Value: "ssh -N -D 1080 -f user@host", Desc: "SOCKS в фоне"},
 
 		{Type: TypeHeader, Value: "🛠️ Управление"},
 		{Type: TypeCmd, Value: "ssh-keygen -t ed25519 -C 'my_pc'", Desc: "Генерация современного ключа"},

@@ -7,12 +7,19 @@ var ProcessesSection = Section{
 		{Type: TypeTip, Value: "PID — ID процесса. PPID — ID родителя (кто породил).\nСостояния: готов → выполняется → ждёт I/O → завершён (zombie, пока родитель не «заберёт» статус)."},
 
 		{Type: TypeHeader, Value: "👀 Смотреть процессы"},
+		{Type: TypeKey, Key: "aux", Desc: "все процессы: пользователь, CPU, RAM, команда"},
+		{Type: TypeKey, Key: "-ef", Desc: "PID и PPID"},
+		{Type: TypeKey, Key: "-eo pid,cmd", Desc: "только выбранные колонки"},
+		{Type: TypeKey, Key: "-f", Desc: "pkill/pgrep: искать по фрагменту командной строки"},
 		{Type: TypeCmd, Value: "ps aux", Desc: "список процессов: CPU, RAM, команда"},
 		{Type: TypeCmd, Value: "ps -ef", Desc: "список с PID и PPID"},
+		{Type: TypeCmd, Value: "ps -eo pid,cmd", Desc: "только колонки PID и команда"},
+		{Type: TypeCmd, Value: "ps auxf", Desc: "дерево процессов"},
 		{Type: TypeCmd, Value: "pgrep -a nginx", Desc: "найти PID по имени (+ команда)"},
 		{Type: TypeCmd, Value: "pstree -p", Desc: "дерево процессов с PID"},
 		{Type: TypeCmd, Value: "top", Desc: "интерактивно: кто грузит систему (q — выход)"},
 		{Type: TypeCmd, Value: "htop", Desc: "удобнее top, если установлен"},
+		{Type: TypeCmd, Value: "ps auxf | grep telegram-desktop | grep -v grep", Desc: "найти процесс без самой строки grep"},
 
 		{Type: TypeHeader, Value: "🛑 Сигналы и kill"},
 		{Type: TypeTip, Value: "Сигнал — способ ядра сообщить процессу о событии.\nСначала мягко (SIGTERM), если не помогло и точно свой процесс — SIGKILL."},
@@ -23,6 +30,7 @@ var ProcessesSection = Section{
 		{Type: TypeCmd, Value: "kill -9 PID", Desc: "SIGKILL — принудительно (последний аргумент)"},
 		{Type: TypeCmd, Value: "killall имя", Desc: "сигнал всем процессам с таким именем"},
 		{Type: TypeCmd, Value: "pkill -f \"python app.py\"", Desc: "убить по фрагменту командной строки"},
+		{Type: TypeCmd, Value: "ps -eo pid,cmd | grep telegram | grep -v grep | cut -d' ' -f1 | xargs kill", Desc: "PID из таблицы → аргумент kill"},
 		{Type: TypeWarn, Value: "kill -9 — только если процесс точно завис и свой. Данные могут не сохраниться."},
 
 		{Type: TypeHeader, Value: "🎚️ Приоритет (nice)"},
