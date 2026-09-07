@@ -3,7 +3,7 @@ package data
 var RegexSection = Section{
 	Title: "🧩 РЕГУЛЯРНЫЕ ВЫРАЖЕНИЯ",
 	Items: []Item{
-		{Type: TypeTip, Value: "Regex — шаблон «найди вот такой текст».\nРаботает с: grep -E, sed -E, awk.\nПиши шаблон в одинарных кавычках '...' — иначе bash сломает $ и *."},
+		{Type: TypeTip, Value: "Regex — шаблон «найди вот такой текст».\nРаботает с: grep -E, sed -E, awk, bash [[ =~ ]].\nПиши шаблон в одинарных кавычках '...' — иначе bash сломает $ и *."},
 		{Type: TypeTip, Value: "Проверка:\ngrep -Eo 'шаблон' файл\n-E = расширенные regex\n-o = показать ТОЛЬКО совпадение (удобно учиться)"},
 
 		{Type: TypeHeader, Value: "🧱 Буквы конструктора"},
@@ -23,6 +23,14 @@ var RegexSection = Section{
 		{Type: TypeKey, Key: "[A-Za-z]", Desc: "любая латинская буква"},
 		{Type: TypeKey, Key: "[^0-9]", Desc: "всё КРОМЕ цифр"},
 		{Type: TypeKey, Key: "[[:space:]]", Desc: "пробел или таб"},
+
+		{Type: TypeHeader, Value: "🐚 Bash: [[ =~ ]]"},
+		{Type: TypeTip, Value: "=~ внутри [[ ]] — совпадение с regex (как grep -E).\n^[0-9]+$ — вся строка только цифры (целое число)."},
+		{Type: TypeKey, Key: "=~", Desc: "проверить строку regex в [[ ]]"},
+		{Type: TypeKey, Key: "^[0-9]+$", Desc: "начало + одна и больше цифр + конец"},
+		{Type: TypeCmd, Value: "[[ $first =~ ^[0-9]+$ ]] && echo ok", Desc: "$first — только цифры"},
+		{Type: TypeTip, Value: "if [[ ! $first =~ ^[0-9]+$ ]]; then\n  echo \"нужно целое число\" >&2\n  exit 1\nfi"},
+		{Type: TypeCmd, Value: "grep -E '^[0-9]+$' file.txt", Desc: "строки, где только цифры"},
 
 		{Type: TypeHeader, Value: "📧 Email"},
 		{Type: TypeCmd, Value: "grep -Eo '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}' file.txt", Desc: "найти email"},
